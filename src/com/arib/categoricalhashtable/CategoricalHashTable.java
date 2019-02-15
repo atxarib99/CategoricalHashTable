@@ -36,6 +36,9 @@ public class CategoricalHashTable<Value extends CategoricalHashTableInterface> {
     //holds list of tags that have been entered into the CategoricalHashTable
     private ArrayList<String> tags;
     
+    //holds true if table is currently rehashing
+    boolean rehashing;
+    
     /**
      * Constructor that defaults the HashTable size to 20 and initiates the list of tags
      */
@@ -43,6 +46,7 @@ public class CategoricalHashTable<Value extends CategoricalHashTableInterface> {
         table = new LinkedList[20];
         tags = new ArrayList<>();
         listeners = new ArrayList<>();
+        rehashing = false;
     }
     
     /**
@@ -54,6 +58,7 @@ public class CategoricalHashTable<Value extends CategoricalHashTableInterface> {
         table = new LinkedList[Math.max(size, 20)];
         tags = new ArrayList<>();
         listeners = new ArrayList<>();
+        rehashing = false;
     }
     
     /**
@@ -123,7 +128,7 @@ public class CategoricalHashTable<Value extends CategoricalHashTableInterface> {
         //calculate the load factor by calculating percent of table filled
         float load = loadCount / table.length;
         //if the current load exceeds the max load factor we have set for the table, rehash
-        if(load > loadFactor)
+        if(load > loadFactor && !rehashing)
             rehash();
     }
     
@@ -287,6 +292,8 @@ public class CategoricalHashTable<Value extends CategoricalHashTableInterface> {
      * Now there are more open spots for the put to find, load factor is lowered again
      */
     private void rehash() {
+        //let the program know that we are rehashing.
+        rehashing = true;
         //create new table twice the size
         LinkedList<Value>[] newTable = new LinkedList[table.length * 2];
         //for every index of current table
@@ -304,6 +311,8 @@ public class CategoricalHashTable<Value extends CategoricalHashTableInterface> {
         
         //set the current table to the new table
         table = newTable;
+        //store that we are no longer rehashing
+        rehashing = false;
     }
     
     /**
